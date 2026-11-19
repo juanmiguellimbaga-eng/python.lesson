@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Diagnostics</title>
+  <style>
+    :root {
+      --navy: #14213d;
+      --blue: #3a86c8;
+      --cyan: #7ec8e3;
+      --ink: #1d2939;
+      --muted: #697586;
+      --line: #dde5ed;
+      --surface: #ffffff;
+      --background: #f1f5f8;
+      --danger: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(58, 134, 200, 0.08), transparent 38%),
+        var(--background);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .topbar {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 38px;
+      color: white;
+      background: var(--navy);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 18px;
+      font-weight: 750;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 2px solid var(--cyan);
+      border-radius: 50%;
+      color: var(--cyan);
+      font-size: 14px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #dbe9f5;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #63d4a5;
+      box-shadow: 0 0 10px rgba(99, 212, 165, 0.8);
+    }
+
+    main {
+      width: min(1080px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 42px 0 60px;
+    }
+
+    .page-heading {
+      margin-bottom: 24px;
+    }
+
+    .page-heading h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 34px;
+      letter-spacing: -0.03em;
+    }
+
+    .page-heading p {
+      margin: 7px 0 0;
+      color: var(--muted);
+    }
+
+    .device-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(20, 33, 61, 0.07);
+    }
+
+    .device-label {
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .device-address {
+      color: var(--navy);
+      font-family: Consolas, monospace;
+      font-size: 18px;
+      font-weight: 750;
+    }
+
+    button {
+      min-width: 180px;
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 18px;
+      color: white;
+      background: var(--blue);
+      font-weight: 750;
+      cursor: pointer;
+      box-shadow: 0 7px 18px rgba(58, 134, 200, 0.22);
+    }
+
+    button:hover { background: #2f75b1; }
+
+    .error {
+      margin: 0 0 20px;
+      padding: 15px 17px;
+      border: 1px solid #f3b9b5;
+      border-radius: 9px;
+      color: var(--danger);
+      background: #fff2f1;
+    }
+
+    .results-title {
+      margin: 28px 0 12px;
+      color: var(--navy);
+      font-size: 18px;
+    }
+
+    .results-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 6px 20px rgba(20, 33, 61, 0.05);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f9fbfc;
+    }
+
+    .command {
+      color: var(--navy);
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .complete {
+      color: #27826a;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    pre {
+      max-height: 400px;
+      overflow: auto;
+      margin: 0;
+      padding: 18px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #354152;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 620px) {
+      .topbar { height: 62px; padding: 0 18px; }
+      .status { display: none; }
+      main { width: calc(100% - 24px); padding-top: 26px; }
+      .page-heading h1 { font-size: 28px; }
+      .device-panel { grid-template-columns: 1fr; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">R</span>
+      Network Diagnostics
+    </div>
+    <div class="status"><span class="status-dot"></span>Console online</div>
+  </header>
+
+  <main>
+    <div class="page-heading">
+      <h1>Router Command Center</h1>
+      <p>Run connectivity and configuration diagnostics on the selected router.</p>
+    </div>
+
+    <section class="device-panel" aria-label="Router connection">
+      <div>
+        <div class="device-label">Target device</div>
+        <div class="device-address">192.168.10.79:32770</div>
+      </div>
+      <form method="post">
+        <button type="submit">Run Diagnostics</button>
+      </form>
+    </section>
+
+    {% if error %}
+      <div class="error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    {% if results %}
+      <h2 class="results-title">Command Results</h2>
+      <section class="results-grid" aria-label="Command results">
+        {% for command, output in results.items() %}
+          <article class="result-card">
+            <div class="result-header">
+              <span class="command">{{ command }}</span>
+              <span class="complete">Completed</span>
+            </div>
+            <pre>{{ output }}</pre>
+          </article>
+        {% endfor %}
+      </section>
+    {% endif %}
+  </main>
+</body>
+</html>
