@@ -14,19 +14,11 @@ def index():
     if request.method == "POST":
         router_device = {
             'device_type': 'cisco_ios_telnet',
-            'ip': '192.168.10.79',
+            'ip': '192.168.10.100',
             'port': 32770,
             'username': 'admin',
-            'password': 'eve',
-            'secret': 'eve',
-            'fast_cli': False,
-            'global_delay_factor': 2,
-            'conn_timeout': 30,
-            'auth_timeout': 30,
-            'banner_timeout': 30,
-            'blocking_timeout': 30,
-            'session_timeout': 60,
-            'read_timeout_override': 30,
+            'password': 'eve123',
+            'secret': 'eve123',
         }
 
 
@@ -37,20 +29,23 @@ def index():
         ]
 
 
-        net_connect = None
         try:
+            # Connect to the router
             net_connect = ConnectHandler(**router_device)
             net_connect.enable()
 
+
+            # Run commands and store outputs in a dictionary
             for cmd in commands_to_run:
-                output = net_connect.send_command(cmd, read_timeout=30)
+                output = net_connect.send_command(cmd)
                 results[cmd] = output
+
+
+            net_connect.disconnect()
+
 
         except Exception as e:
             error = f"Connection failed: {e}"
-        finally:
-            if net_connect is not None:
-                net_connect.disconnect()
 
 
     return render_template("index.html", results=results, error=error)
